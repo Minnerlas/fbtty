@@ -1,4 +1,5 @@
 test
+test*
 *.bak
 bin/*.o
 *.out

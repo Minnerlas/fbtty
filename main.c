@@ -81,10 +81,14 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 
 	size_t i;
 	fd_set readable;
-	// XEvent ev;
 	char buf[1];
 	int just_wrapped = 0;
 	int out_of_bounds = 0;
+
+	uint8_t utf_buf[5] = {0};
+	int utf_size = 0;
+	int utf_target_size = 0;
+	int kraj_utf = 1;
 
 	// maxfd = master > x11->fd ? master : x11->fd;
 
@@ -192,12 +196,77 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 							just_wrapped = 0;
 
 						assert(tty->curx < tty->sir);
-						tty->cbuf[tty->cury * tty->sir + tty->curx] = (struct cchar){buf[0], tty->fg, tty->bg};
-						// printf("Char: %d\n", buf[0]);
-						crtaj_char(tty, tty->curx, tty->cury);
-						tty->curx++;
-						if(tty->curx >= tty->sir)
-							out_of_bounds = 1;
+
+						uint32_t c = (uint8_t)buf[0];
+						// printf("CHAR: %u\n", c);
+
+						if(c <= 127) {
+							if(!kraj_utf) {
+								c = NEPOZNATO;
+								utf_target_size = 0;
+								utf_size = 0;
+								utf_buf[0] = 0;
+							}
+							kraj_utf = 1;
+						} else if(c > 127 || !kraj_utf) {
+							// printf("UTF CHAR: 0x%x\n", (uint8_t)*buf);
+
+							if((*buf & 0xc0) == 0xc0) {
+								utf_buf[0] = *buf;
+								utf_size = 1;
+								kraj_utf = 0;
+								if((uint8_t)*buf <= 0xdf) {
+									utf_target_size = 2;
+								} else if((uint8_t)*buf <= 0xef) {
+									utf_target_size = 3;
+								} else if((uint8_t)*buf <= 0xf7) {
+									utf_target_size = 4;
+								} else {
+									utf_target_size = 0;
+									utf_buf[0] = 0;
+									utf_size = 0;
+									c = NEPOZNATO;
+									kraj_utf = 1;
+								}
+							} else if((c >= 0x80) && (c <= 0xbf)) {
+								utf_buf[utf_size++] = *buf;
+								kraj_utf = 0;
+								// printf("ASDJHSAD: ");
+								// for(int i = 0; i < utf_size; i++)
+								// 	printf("%d ", utf_buf[i]);
+								// putchar('\n');
+								if(utf_size == utf_target_size) {
+									c = utf_to_ucs32(utf_size, utf_buf);
+									utf_target_size = 0;
+									utf_buf[0] = 0;
+									utf_size = 0;
+									kraj_utf = 1;
+								}
+							} else {
+								utf_target_size = 0;
+								utf_buf[0] = 0;
+								utf_size = 0;
+								c = NEPOZNATO;
+								kraj_utf = 1;
+							}
+
+						}
+
+						if(kraj_utf) {
+							if(c > 127)
+								printf("UCS-32: %d\n", c);
+
+							// TODO: Promeniti u proveru UTF-8 koda
+							// Za sada služi kao provera tačnosti parsovanja, bez provere tačnosti UTF-8 koda
+							assert(utf_size == 0);
+
+							tty->cbuf[tty->cury * tty->sir + tty->curx] = (struct cchar){c, tty->fg, tty->bg};
+							// printf("Char: %d\n", buf[0]);
+							crtaj_char(tty, tty->curx, tty->cury);
+							tty->curx++;
+							if(tty->curx >= tty->sir)
+								out_of_bounds = 1;
+						}
 					}
 
 

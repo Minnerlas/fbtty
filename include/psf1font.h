@@ -26,6 +26,7 @@ struct psf1_header {
 
 
 int nadji_uc(struct psf1_header *font, int uc);
+uint32_t utf_to_ucs32(int utf_size, uint8_t *utf_buf);
 
 #define EXT_ASCII_SIZE 128
 extern const uint32_t ext_ascii[EXT_ASCII_SIZE];

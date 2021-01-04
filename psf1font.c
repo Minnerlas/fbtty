@@ -2,12 +2,16 @@
 
 //#define TEST
 
+#include <limits.h>
+
 #ifdef TEST
 #include <stdio.h>
 #endif
 
 
 int nadji_uc(struct psf1_header *font, int uc) {
+	if (uc >= (1<<16))
+		return -1;
 	int vel_char = font->charsize;
 	const int mod = (font->mode) & PSF1_MODE512;
 	uint8_t *tabela = font->karakteri+(mod?512:256)*vel_char;
@@ -44,6 +48,20 @@ int nadji_uc(struct psf1_header *font, int uc) {
 }
 
 
+uint32_t utf_to_ucs32(int utf_size, uint8_t *utf_buf) {
+	uint32_t c = 0;
+	if((uint8_t)*utf_buf <= 0xdf) {
+		c = *utf_buf & 0x1f;
+	} else if((uint8_t)*utf_buf <= 0xef) {
+		c = *utf_buf & 0xf;
+	} else if((uint8_t)*utf_buf <= 0xf7) {
+		c = *utf_buf & 0x7;
+	}
+	for(int i = 1; i < utf_size; i++)
+		c = (c << 6) + (utf_buf[i] & 0x3f);
+
+	return c;
+}
 
 
 
