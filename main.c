@@ -180,6 +180,7 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 					} else {
 						// tty->cbuf[tty->cury * tty->sir + tty->curx] = (struct cchar){(uint8_t)buf[0]>127?ext_ascii[(uint8_t)buf[0]-128] :buf[0], tty->fg, tty->bg};
 						// TODO
+
 						if (tty->curx < tty->sir)
 							out_of_bounds = 0;
 						if (out_of_bounds) {
