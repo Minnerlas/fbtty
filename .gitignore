@@ -1,0 +1,6 @@
+test
+*.bak
+bin/*.o
+*.out
+cur
+t.py
