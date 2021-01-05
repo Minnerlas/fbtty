@@ -147,7 +147,7 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 						if(tty->curx + t <= tty->sir) {
 							for(size_t i = 0; i < t; i++) 
 								tty->cbuf[tty->cury * tty->sir + tty->curx++] = (struct cchar){' ', tty->fg, tty->bg};
-							crtaj_red_kursor(tty, tty->cury);
+							crtaj_red_kursor(tty);
 						} else
 							tty->curx += t;
 
@@ -294,7 +294,7 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 					 * to the next line *again*.) */
 					tty->cury++;
 					just_wrapped = 0;
-					crtaj_red_kursor(tty, tty->curx);
+					crtaj_red_kursor(tty);
 				}
 
 				/* We now check if "the next line" is actually outside

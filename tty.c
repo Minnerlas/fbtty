@@ -96,13 +96,13 @@ void crtaj_red(struct tty_info *tty, size_t red) {
 		
 }
 
-void crtaj_red_kursor(struct tty_info *tty, size_t red) {
+void crtaj_red_kursor(struct tty_info *tty) {
+	assert(tty->curx < tty->sir);
 	for(size_t x = 0; x < tty->curx; x++) {
-		assert(x < tty->sir);
-		draw_char(tty, x*8, red*tty->font->charsize, 
-			nadji_uc(tty->font, tty->cbuf[x + red*tty->sir].ch), 
-			tty->cbuf[x + red*tty->sir].fgcol,
-			tty->cbuf[x + red*tty->sir].bgcol);
+		draw_char(tty, x*8, tty->cury*tty->font->charsize, 
+			nadji_uc(tty->font, tty->cbuf[x + tty->cury*tty->sir].ch), 
+			tty->cbuf[x + tty->cury*tty->sir].fgcol,
+			tty->cbuf[x + tty->cury*tty->sir].bgcol);
 	}
 		
 }

@@ -38,6 +38,6 @@ void crtaj(struct tty_info *tty);
 void crtaj_cursor(struct tty_info *tty);
 void crtaj_char(struct tty_info *tty, size_t x, size_t y);
 void crtaj_red(struct tty_info *tty, size_t red);
-void crtaj_red_kursor(struct tty_info *tty, size_t red);
+void crtaj_red_kursor(struct tty_info *tty);
 
 #endif /* TTY_H */
