@@ -78,6 +78,15 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 					a *= 10, a += inbuf[i] - '0';
 				// printf("ANSI COL: %d\n", a);
 				set_ansi_style(tty, a);
+				// asd
+				printf("ANSI Style sequence: ");
+				for(size_t i = 0; i < inbuf_size; i++)
+					if(isgraph(inbuf[i]))
+						putchar(inbuf[i]);
+					else
+						printf("'\\x%x'", inbuf[i]);
+				putchar('\n');
+				// asd
 			}
 			break;
 		case 'A':
