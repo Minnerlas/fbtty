@@ -258,6 +258,11 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 							// TODO: Promeniti u proveru UTF-8 koda
 							// Za sada služi kao provera tačnosti parsovanja, bez provere tačnosti UTF-8 koda
 							assert(utf_size == 0);
+							if (tty->cury >= tty->vis) {
+								skroluj(tty);
+								// crtaj_red(tty, tty->curx);
+								crtaj(tty);
+							}
 
 							tty->cbuf[tty->cury * tty->sir + tty->curx] = (struct cchar){c, tty->fg, tty->bg};
 							// printf("Char: %d\n", buf[0]);
@@ -293,7 +298,12 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 					 * to the next line *again*.) */
 					tty->cury++;
 					just_wrapped = 0;
-					crtaj_red_kursor(tty);
+					if (tty->cury >= tty->vis) {
+						skroluj(tty);
+						// crtaj_red(tty, tty->curx);
+						crtaj(tty);
+					} else 
+						crtaj_red_kursor(tty);
 				}
 
 				/* We now check if "the next line" is actually outside

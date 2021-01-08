@@ -4,7 +4,7 @@ INCDIR=include/
 # PREFIKS=LD_PRELOAD=${LIBDIR}/libsigil.so
 # SIGIL=-lsigil 
 # CFLAGS=-Wall -Wextra -g -L${LIBDIR} -I${INCDIR} ${SIGIL}
-PROF=-pg
+# PROF=-pg
 CFLAGS=-Wall -Wextra -Wpedantic -g -I${INCDIR} -O2 ${PROF}
 LINKFLAGS=-g ${PROF}
 CSOURCES=$(wildcard *.c)
