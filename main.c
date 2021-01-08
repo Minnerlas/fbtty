@@ -551,7 +551,25 @@ int main() {
 	if(slave > maxfd)
 		maxfd = slave;
 
-	int kbdfd = open("/dev/input/event3", O_RDONLY);
+	const char COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER[] =
+		"grep -E 'Handlers|EV=' /proc/bus/input/devices |"
+		"grep -B1 'EV=120013' |"
+		"grep -Eo 'event[0-9]+' |"
+		"grep -Eo '[0-9]+' |"
+		"tr -d '\n'";
+	FILE *pipe = popen(COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER, "r");
+	char buffer[128] = {0};
+	char kdb_file[256] = {0};
+
+	while (!feof(pipe))
+		if (fgets(buffer, 128, pipe) != NULL)
+			strncat(kdb_file, buffer, 255);
+
+	pclose(pipe);
+	snprintf(kdb_file, 256, "/dev/input/event%s", buffer);
+	printf("%s\n", kdb_file);
+
+	int kbdfd = open(kdb_file, O_RDONLY);
 	if(kbdfd < 0) {
 		fprintf(stderr, "Error while opening the keyboard\n");
 		return_code = 1;
