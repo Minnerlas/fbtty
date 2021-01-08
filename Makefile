@@ -4,8 +4,9 @@ INCDIR=include/
 # PREFIKS=LD_PRELOAD=${LIBDIR}/libsigil.so
 # SIGIL=-lsigil 
 # CFLAGS=-Wall -Wextra -g -L${LIBDIR} -I${INCDIR} ${SIGIL}
-CFLAGS=-Wall -Wextra -Wpedantic -g -I${INCDIR} -O2 -pg
-LINKFLAGS=-g -pg
+PROF=-pg
+CFLAGS=-Wall -Wextra -Wpedantic -g -I${INCDIR} -O2 ${PROF}
+LINKFLAGS=-g ${PROF}
 CSOURCES=$(wildcard *.c)
 HEADERS=$(wildcard include/*.h)
 BINS=$(patsubst %.c,bin/%.o,$(CSOURCES))
@@ -26,7 +27,7 @@ dbg: ${OUT}
 	${PREFIKS} gdb ./${OUT}
 
 run_val: ${OUT}
-	${PREFIKS} valgrind --leak-check=full --show-leak-kinds=all ./${OUT}
+	${PREFIKS} valgrind --log-file=test.log --leak-check=full --show-leak-kinds=all ./${OUT}
 
 clean:
 	rm -rvf bin/*

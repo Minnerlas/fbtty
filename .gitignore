@@ -1,7 +1,10 @@
+.link*
+.elink*
 test
 test*
 *.bak
 bin/*.o
 *.out
 cur
+fbtty
 t.py

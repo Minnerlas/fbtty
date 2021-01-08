@@ -106,3 +106,12 @@ void crtaj_red_kursor(struct tty_info *tty) {
 	}
 		
 }
+
+void skroluj(struct tty_info *tty) {
+	memmove(tty->cbuf, &tty->cbuf[tty->sir],
+			tty->sir * (tty->vis - 1) * sizeof(*tty->cbuf));
+	tty->cury = tty->vis - 1;
+
+	for (size_t i = 0; i < tty->sir; i++)
+		tty->cbuf[tty->cury * tty->sir + i] = (struct cchar){' ', tty->fg, tty->bg};
+}

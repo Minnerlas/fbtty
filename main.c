@@ -79,7 +79,6 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 	static size_t inbuf_size = 0;
 	// static int ansi_gotovo = 0;
 
-	size_t i;
 	fd_set readable;
 	char buf[1];
 	int just_wrapped = 0;
@@ -253,8 +252,8 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 						}
 
 						if(kraj_utf) {
-							if(c > 127)
-								printf("UCS-32: %d\n", c);
+							// if(c > 127)
+							// 	printf("UCS-32: %d\n", c);
 
 							// TODO: Promeniti u proveru UTF-8 koda
 							// Za sada služi kao provera tačnosti parsovanja, bez provere tačnosti UTF-8 koda
@@ -304,12 +303,7 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 				 * After the memmove(), the last line still has the old
 				 * content. We must clear it. */
 				if (tty->cury >= tty->vis) {
-					memmove(tty->cbuf, &tty->cbuf[tty->sir],
-							tty->sir * (tty->vis - 1) * sizeof(*tty->cbuf));
-					tty->cury = tty->vis - 1;
-
-					for (i = 0; i < tty->sir; i++)
-						tty->cbuf[tty->cury * tty->sir + i] = (struct cchar){' ', tty->fg, tty->bg};
+					skroluj(tty);
 					// crtaj_red(tty, tty->curx);
 					crtaj(tty);
 				}
