@@ -74,25 +74,24 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'm':
 			{
 				int a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				// printf("ANSI COL: %d\n", a);
 				set_ansi_style(tty, a);
-				// asd
-				printf("ANSI Style sequence: ");
-				for(size_t i = 0; i < inbuf_size; i++)
-					if(isgraph(inbuf[i]))
-						putchar(inbuf[i]);
-					else
-						printf("'\\x%x'", inbuf[i]);
-				putchar('\n');
+				// printf("ANSI Style sequence: ");
+				// for(size_t i = 0; i < inbuf_size; i++)
+				// 	if(isgraph(inbuf[i]))
+				// 		putchar(inbuf[i]);
+				// 	else
+				// 		printf("'\\x%x'", inbuf[i]);
+				// putchar('\n');
 				// asd
 			}
 			break;
 		case 'A':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				// printf("ANSI UP: %ld\n", a);
@@ -102,7 +101,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'B':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i] && i < inbuf_size); i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				// printf("ANSI DOWN: %ld\n", a);
@@ -112,7 +111,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'C':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i] && i < inbuf_size); i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				// printf("ANSI LEFT: %ld\n", a);
@@ -122,17 +121,17 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'D':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i] && i < inbuf_size); i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
-				// printf("ANSI RIGHT: %ld\n", a);
+				// printf("                 ANSI RIGHT: %ld\tinb:^[%s\n", a, inbuf+1);
 				tty->curx = tty->curx <= a ? 0 : tty->curx - a;
 			}
 			break;
 		case 'E':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				// printf("ANSI LINE UP: %ld\n", a);
@@ -144,7 +143,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'F':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				// printf("ANSI DOWN: %ld\n", a);
@@ -155,7 +154,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'G':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				// printf("ANSI CHA: %ld\n", a);
@@ -180,12 +179,12 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 				if(inbuf[i] == ';') {
 					i++;
 				} else {
-					for(i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+					for(i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 						a *= 10, a += inbuf[i] - '0';
 					i++;
 				} 
 				if(isdigit(inbuf[i]))
-					for(; isdigit(inbuf[i]) && i < inbuf_size; i++)
+					for(; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 						b *= 10, b += inbuf[i] - '0';
 
 				a = a ? a : 1;
@@ -248,7 +247,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'L':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 
@@ -286,7 +285,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'M':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				printf("ANSI Delete Line: %ld\n", a);
 				a = a ? a : 1;
@@ -309,7 +308,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'P':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				printf("ANSI Delete Chars: %ld\n", a);
@@ -329,7 +328,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'X':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				printf("ANSI Erase Chars: %ld\n", a);
@@ -347,7 +346,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'd':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				// printf("ANSI LPA: %ld\n", a);
@@ -358,7 +357,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'n':
 			{
 				int a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				// printf("ANSI n: %d\n", a);
 				switch(a) {
@@ -380,7 +379,7 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case '@':
 			{
 				size_t a = 0;
-				for(size_t i = 2; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 2; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				printf("ANSI Insert Blank: %ld\n", a);
@@ -412,7 +411,7 @@ void priv_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'l':
 			{
 				int a = 0;
-				for(size_t i = 3; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 3; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				switch(a) {
@@ -432,7 +431,7 @@ void priv_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 		case 'h':
 			{
 				int a = 0;
-				for(size_t i = 3; isdigit(inbuf[i]) && i < inbuf_size; i++)
+				for(size_t i = 3; isdigit(inbuf[i]) && (i < inbuf_size); i++)
 					a *= 10, a += inbuf[i] - '0';
 				a = a ? a : 1;
 				switch(a) {

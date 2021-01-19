@@ -15,9 +15,9 @@ OUT=fbtty
 all: ${OUT}
 
 ${OUT}: $(BINS) font/fnt.o 
-	gcc $^ -o $@ ${LINKFLAGS}
+	gcc -o $@ ${LINKFLAGS} $^
 
-bin/%.o: %.c
+bin/%.o: %.c Makefile
 	gcc ${CFLAGS} -c $< -o $@
 
 run: ${OUT}

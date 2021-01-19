@@ -7,4 +7,4 @@ bin/*.o
 *.out
 cur
 fbtty
-t.py
+t*

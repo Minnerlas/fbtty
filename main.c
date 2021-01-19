@@ -2,12 +2,14 @@
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <ctype.h>
+#include <fcntl.h>
 #include <assert.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <fcntl.h>
 #include <unistd.h>
+#include <linux/kd.h>
 #include <sys/ioctl.h>     
 #include <sys/select.h>
 #include <linux/input.h>
@@ -21,16 +23,34 @@
 
 
 #define SHELL "/bin/dash"
+#define TTYDEV "/dev/tty"
 
-extern char _binary____zap_ext_light18_psf_start[];
-extern char _binary____zap_ext_light18_psf_end[];
-// extern char _binary_zap_ext_light16_psf_start[];
-// extern char _binary_zap_ext_light16_psf_end[];
+#define UNUSED(x) (void)(x)
+
+// extern char _binary____zap_ext_light18_psf_start[];
+// extern char _binary____zap_ext_light18_psf_end[];
+extern char _binary_zap_ext_light16_psf_start[];
+extern char _binary_zap_ext_light16_psf_end[];
 
 extern const uint32_t sr_latin_keymap[0x27d];
 extern const uint32_t sr_latin_keymap_shift[0x27d];
 extern const uint32_t sr_latin_keymap_altgr[0x27d];
 
+struct resman *rm = NULL;
+int return_code = 0;
+
+void SIGINT_handler(int signum) { 
+	UNUSED(signum);
+	oslobodi_resman(rm);
+	exit(return_code);
+}
+
+void close_tty(void *p) {
+	int fd = (long int)p;
+	if (ioctl (fd, KDSETMODE, KD_TEXT) == -1)
+		fprintf(stderr, "Error: cannot set tty into text mode on " TTYDEV "\n");
+	close(fd);
+}
 
 int spawn(struct tty_info *tty, int master, int slave) {
 	pid_t p;
@@ -456,14 +476,27 @@ int run(struct tty_info *tty, int master, int kbdfd, int maxfd) {
 }
 
 int main() {
-	struct resman *rm = init_resman();
-	int return_code = 0;
+	signal(SIGINT, SIGINT_handler);
+	rm = init_resman();
+	return_code = 0;
 	int master = -1, maxfd = 2;
 	if(!rm) {
 		fprintf(stderr, "Error while allocating memory\n");
 		return_code = 1;
 		goto KRAJ;
 	}
+
+	int ttyfd = open(TTYDEV, O_RDWR);
+	if(ttyfd < 0) {
+		fprintf(stderr, "Error while opening tty device\n");
+		return_code = 1;
+		goto KRAJ;
+	}
+	dodaj_resman(rm, (void*)(long int)ttyfd, close_tty);
+
+	if (ioctl (ttyfd, KDSETMODE, KD_GRAPHICS) == -1)
+		fprintf(stderr, "Error: cannot set tty into graphics mode on " TTYDEV "\n");
+
 
 	struct fb *framebuffer = init_fb();
 	if(!framebuffer) {
@@ -473,9 +506,9 @@ int main() {
 	}
 	dodaj_resman(rm, framebuffer, (void (*)(void*))close_fb);
 
-	struct psf1_header *font = 
-		(struct psf1_header*)_binary____zap_ext_light18_psf_start;
-	// struct psf1_header *font = (struct psf1_header*)_binary_zap_ext_light16_psf_start;
+	// struct psf1_header *font = 
+	// 	(struct psf1_header*)_binary____zap_ext_light18_psf_start;
+	struct psf1_header *font = (struct psf1_header*)_binary_zap_ext_light16_psf_start;
 	if(font->magic[0] != PSF1_MAGIC0 || font->magic[1] != PSF1_MAGIC1) {
 		fprintf(stderr, "Wrong magic number for PS1 font header\n");
 		return_code = 1;
