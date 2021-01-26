@@ -3,10 +3,6 @@
 
 #include <stdlib.h>
 
-#ifdef DEBUG
-#include <stdio.h>
-#endif
-
 struct _clan {
 	void *res;
 	void (*dealokator)(void*);
@@ -37,7 +33,7 @@ void _oslobodi_dniz(struct _dniz *niz) {
 
 int _dodaj_dniz(struct _dniz* niz, struct _clan c) {
 	if(niz->duz == niz->stvduz) {
-		struct _clan *p = reallocarray(niz->niz, niz->stvduz*=2, sizeof(*niz->niz));
+		struct _clan *p = realloc(niz->niz, niz->stvduz*=2 * sizeof(*niz->niz));
 		if(!p)
 			return -1;
 		niz->niz = p;

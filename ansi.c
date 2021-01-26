@@ -277,7 +277,8 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 				}
 
 				crtaj(tty);
-				crtaj_cursor(tty);
+				if (tty->curx < tty->sir)
+					crtaj_cursor(tty);
 
 			}
 			break;
@@ -320,7 +321,8 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 					tty->cbuf[x + tty->cury*tty->sir] = (struct cchar){' ', tty->fg, tty->bg};
 
 				crtaj_red(tty, tty->cury);
-				crtaj_cursor(tty);
+				if (tty->curx < tty->sir)
+					crtaj_cursor(tty);
 
 			}
 			break;
@@ -338,7 +340,8 @@ void std_ansi(struct tty_info *tty, size_t inbuf_size, char *inbuf) {
 					tty->cbuf[x + tty->cury*tty->sir] = (struct cchar){' ', tty->fg, tty->bg};
 
 				crtaj_red(tty, tty->cury);
-				crtaj_cursor(tty);
+				if (tty->curx < tty->sir)
+					crtaj_cursor(tty);
 
 			}
 			break;

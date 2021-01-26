@@ -486,6 +486,7 @@ int main() {
 		goto KRAJ;
 	}
 
+#ifdef NTESTFB
 	int ttyfd = open(TTYDEV, O_RDWR);
 	if(ttyfd < 0) {
 		fprintf(stderr, "Error while opening tty device\n");
@@ -496,6 +497,7 @@ int main() {
 
 	if (ioctl (ttyfd, KDSETMODE, KD_GRAPHICS) == -1)
 		fprintf(stderr, "Error: cannot set tty into graphics mode on " TTYDEV "\n");
+#endif
 
 
 	struct fb *framebuffer = init_fb();
